@@ -12,7 +12,7 @@ env:
   ECS_CLUSTER: test-cluster
   ECS_TASK_DEFINITION: .aws/task_definition.json
   CONTAINER_NAME: is-even-api
-  ROCKET_ADDRESS: ${{ env.ROCKET_ADDRESS }}
+  ROCKET_ADDRESS: 0.0.0.0
 
 jobs:
   deploy:
