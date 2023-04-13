@@ -7,7 +7,12 @@ fn is_even(x: i32) -> String {
     res.to_string()
 }
 
+#[get("/health")]
+fn health() -> String {
+    String::from("not dead")
+}
+
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![is_even])
+    rocket::build().mount("/", routes![is_even, health])
 }
