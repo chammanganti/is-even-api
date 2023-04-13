@@ -12,7 +12,7 @@ env:
   ECS_CLUSTER: test-cluster
   ECS_TASK_DEFINITION: .aws/task_definition.json
   CONTAINER_NAME: is-even-api
-  ROCKET_ADDRESS: ${{ secrets.ROCKET_ADDRESS }}
+  ROCKET_ADDRESS: ${{ env.ROCKET_ADDRESS }}
 
 jobs:
   deploy:
@@ -25,7 +25,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_QA }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
@@ -57,7 +57,21 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
-      - run: cat ${{ steps.task-def.outputs.task-definition }}
+      - run: mv ${{ steps.task-def.outputs.task-definition }} .aws/task_definition.out.json
+
+      - name: Upload task definition (qa)
+        uses: actions/upload-artifact@v3
+        with:
+          name: task_definition.qa.json
+          path: .aws/task_definition.out.json
+          retention-days: 7
+
+      - name: Download task definition
+        uses: actions/download-artifact@v3
+        with:
+          name: task_definition.qa.json
+
+      - run: ls -la && pwd
 
       # - name: Deploy
       #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
